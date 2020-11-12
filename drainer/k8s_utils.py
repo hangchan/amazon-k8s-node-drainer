@@ -119,3 +119,16 @@ def abandon_lifecycle_action(asg_client, auto_scaling_group_name, lifecycle_hook
                                          AutoScalingGroupName=auto_scaling_group_name,
                                          LifecycleActionResult='ABANDON',
                                          InstanceId=instance_id)
+
+def remove_label_from_node(api, node_name, label):
+    """Removes label from specified node."""
+    patch_body = {
+        'metadata': {
+            'labels': {
+                label: None
+            }
+        }
+    }
+
+    api.patch_node(node_name, patch_body)
+

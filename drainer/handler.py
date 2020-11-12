@@ -9,7 +9,7 @@ from botocore.signers import RequestSigner
 import kubernetes as k8s
 from kubernetes.client.rest import ApiException
 
-from k8s_utils import (abandon_lifecycle_action, cordon_node, node_exists, remove_all_pods)
+from k8s_utils import (abandon_lifecycle_action, cordon_node, node_exists, remove_all_pods, remove_label_from_node)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -147,6 +147,9 @@ def _lambda_handler(env, k8s_config, k8s_client, event):
             return
 
         cordon_node(v1, node_name)
+       
+        # allows to remove pod from a daemonset so it can be shutdown gracefully
+        remove_label_from_node(v1, node_name, 'NodeGroup')
 
         remove_all_pods(v1, node_name)
 
